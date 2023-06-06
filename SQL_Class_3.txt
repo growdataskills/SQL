@@ -1,1 +1,71 @@
+------------------- Foreign Key concept---
+use demo_db;
 
+create table abc
+(
+  cust_id int,
+  cust_name varchar(20),
+  primary key (cust_id)
+);
+
+insert into abc values(10,'Shashank');
+
+create table xyz
+(
+  order_id int,
+  c_id int,
+  constraint pk primary key (order_id),
+  constraint fk FOREIGN KEY (c_id) REFERENCES abc(cust_id)
+);
+
+# Inset will fail because value 20 is not present in abc table for cust_id
+insert into xyz values(1001,20);
+
+select * from xyz;
+
+-----------------------------------------
+
+--- Group RollUP
+
+CREATE TABLE payment (payment_amount decimal(8,2), 
+payment_date date, 
+store_id int);
+ 
+INSERT INTO payment
+VALUES
+(1200.99, '2018-01-18', 1),
+(189.23, '2018-02-15', 1),
+(33.43, '2018-03-03', 3),
+(7382.10, '2019-01-11', 2),
+(382.92, '2019-02-18', 1),
+(322.34, '2019-03-29', 2),
+(2929.14, '2020-01-03', 2),
+(499.02, '2020-02-19', 3),
+(994.11, '2020-03-14', 1),
+(394.93, '2021-01-22', 2),
+(3332.23, '2021-02-23', 3),
+(9499.49, '2021-03-10', 3),
+(3002.43, '2018-02-25', 2),
+(100.99, '2019-03-07', 1),
+(211.65, '2020-02-02', 1),
+(500.73, '2021-01-06', 3);
+
+--- Write a query to calculate total reveue of each shop
+--- per year, also display year wise revenue
+
+SELECT
+  SUM(payment_amount),
+  YEAR(payment_date) AS 'Payment Year',
+  store_id AS 'Store'
+FROM payment
+GROUP BY YEAR(payment_date), store_id WITH ROLLUP
+ORDER BY YEAR(payment_date), store_id;
+
+--- Write a query to calculate total revenue per year
+
+SELECT
+  SUM(payment_amount),
+  YEAR(payment_date) AS 'Payment Year'
+FROM payment
+GROUP BY YEAR(payment_date)
+ORDER BY YEAR(payment_date);
